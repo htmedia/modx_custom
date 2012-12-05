@@ -13,7 +13,7 @@
 <html>
 <head>
 	{{head}}
-	<link rel="stylesheet" href="style.css" />
+	<link rel="stylesheet" href="[(site_template)]style.css" />
 </head>
 
 <body>
