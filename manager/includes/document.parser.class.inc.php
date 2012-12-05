@@ -542,6 +542,8 @@ class DocumentParser {
         $phpTime= sprintf("%2.4f s", $phpTime);
         $source= $this->documentGenerated == 1 ? "database" : "cache";
         $queries= isset ($this->executedQueries) ? $this->executedQueries : 0;
+		$mem = (function_exists('memory_get_peak_usage')) ? memory_get_peak_usage()  : memory_get_usage() ;
+		$total_mem = $this->nicesize($mem - $this->mstart);
 
         $out =& $this->documentOutput;
         if ($this->dumpSQL) {
@@ -552,6 +554,7 @@ class DocumentParser {
         $out= str_replace("[^p^]", $phpTime, $out);
         $out= str_replace("[^t^]", $totalTime, $out);
         $out= str_replace("[^s^]", $source, $out);
+		$out= str_replace('[^m^]', $total_mem, $out);
         //$this->documentOutput= $out;
 
         // invoke OnWebPagePrerender event
@@ -562,6 +565,16 @@ class DocumentParser {
         echo $this->documentOutput;
         ob_end_flush();
     }
+	
+	function nicesize($size) {
+		$a = array('B', 'KB', 'MB', 'GB', 'TB', 'PB');
+		$pos = 0;
+		while ($size >= 1024) {
+			   $size /= 1024;
+			   $pos++;
+		}
+		return round($size,2).' '.$a[$pos];
+	}
 
     function checkPublishStatus() {
         $cacheRefreshTime= 0;

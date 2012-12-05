@@ -968,7 +968,8 @@ INSERT IGNORE INTO `{PREFIX}system_settings`
 ('datetime_format','dd-mm-YYYY'),
 ('warning_visibility', '1'),
 ('remember_last_tab', '1'),
-('site_template', 'assets/templates/');
+('site_template', 'assets/templates/'),
+('page_info', 'Mem: [^m^], SQL: [^qt^], [^q^] request(s), PHP: [^p^], total: [^t^], page retrieved from [^s^].');
 
 
 REPLACE INTO `{PREFIX}user_roles` 
