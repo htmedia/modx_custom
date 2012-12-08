@@ -22,5 +22,6 @@
 </div><!-- #wrapper -->
 
 {{scripts}}
+<!-- [(page_info)] -->
 </body>
 </html>

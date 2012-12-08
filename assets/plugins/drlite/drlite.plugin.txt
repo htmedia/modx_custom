@@ -1,0 +1,21 @@
+define(DRLITE_PATH, "assets/plugins/drlite/");
+define(DRLITE_CACHE_DIR, "assets/cache/drlite");
+define(DRLITE_CACHE_PATH, DRLITE_CACHE_DIR."/");
+global $modx;
+
+include_once $modx->config['base_path'].DRLITE_PATH."drlite.php";
+
+$e = &$modx->Event;
+switch ($e->name) {
+	case "OnWebPagePrerender":
+			$modx->documentOutput = RenderOnFrontend($modx->documentOutput, $config);
+	break;
+
+	case "OnCacheUpdate":
+			ClearDRCache($clearCache);
+	break;	
+	
+	default :
+		return;
+	break;
+}
