@@ -39,7 +39,7 @@ rev_003
 добавлено: CodeMirror 2.25 подсветка синтаксиса http://forums.modx.com/thread/73753/codemirror-for-modx-evolution
 добавлено: CustomSettings 1.0 Добавление своих системных настроек http://community.modx-cms.ru/blog/addons/1778.html
 добавлено: SEO Strict URLs 1.0.1 Редирект дублей http://modx.com/extras/package/seostricturls
-добавлено: DirectResizeLite ресайз изображений
+добавлено: DirectResizeLite ресайз изображений http://cad.kurganobl.ru/plagin_directresizelite.html
 
 Шаблоны
 =====================================================

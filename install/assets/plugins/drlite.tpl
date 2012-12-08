@@ -9,7 +9,7 @@
  * @package     modx
  * @internal    @events OnWebPagePrerender,OnCacheUpdate
  * @internal    @modx_category Manager and Admin
- * @internal    @properties &config=Конфигурация;string;highslide &clearCache=Очистка кеша;list;0,1,2;0
+ * @internal    @properties &config=Конфигурация;string;highslide &clearCache=Очистка кеша;list;0,1,2;1
  */
 
 define(DRLITE_PATH, "assets/plugins/drlite/");
