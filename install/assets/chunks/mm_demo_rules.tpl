@@ -25,3 +25,5 @@ mm_changeFieldHelp('log', 'Это поле используется для па�
 
 mm_createTab('SEO', 'seo');
 mm_moveFieldsToTab('seo_title,seo_keywords,seo_description,seo_noindex,sitemap_priority,sitemap_changefreq', 'seo');
+
+//mm_widget_evogallery(2, 'Галерея');

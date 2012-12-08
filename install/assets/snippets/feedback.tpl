@@ -6,7 +6,7 @@
  *
  * @category snippet
  * @version 1.0
- * @internal @modx_category Navigation
+ * @internal @modx_category Content
  * @internal @properties &usite=Адрес сайта;text; &uemail=Email;text;htmedia@mail.ru
  */
  
