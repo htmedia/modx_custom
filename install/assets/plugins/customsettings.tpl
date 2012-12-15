@@ -7,7 +7,7 @@
  * @category    plugin
  * @version     1.0
  * @author      Andchir <andchir@gmaail.com>
- * @internal    @properties &settings=Settings;textarea;Путь к шаблону сайта~site_template||Информация о странице~page_info
+ * @internal    @properties &settings=Settings;textarea;Путь к шаблону сайта [(site_template)]~site_template||Информация о странице [(page_info)]~page_info
  * @internal    @events OnSiteSettingsRender
  * @internal    @modx_category Manager and Admin
  */
