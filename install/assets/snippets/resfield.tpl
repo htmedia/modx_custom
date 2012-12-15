@@ -22,7 +22,7 @@
 $id = isset($id) ? intval($id) : 1;
 $field = isset($field) ? trim($field) : 'pagetitle';
 
-$info = $modx->getTemplateVar($field, '*', $docid);
+$info = $modx->getTemplateVar($field, '*', $id, 0);
 $result = $info['value'];
 
 return $result;
