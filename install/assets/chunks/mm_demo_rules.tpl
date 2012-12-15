@@ -27,3 +27,5 @@ mm_createTab('SEO', 'seo');
 mm_moveFieldsToTab('seo_title,seo_keywords,seo_description,seo_noindex,sitemap_priority,sitemap_changefreq', 'seo');
 
 //mm_widget_evogallery(2, 'Галерея');
+
+//mm_hideFields('longtitle,description,introtext,link_attributes,menutitle,menuindex,show_in_menu,parent,alias,template,content', '', '6');
