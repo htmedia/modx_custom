@@ -1,6 +1,6 @@
-rev_005
+rev_006
 =====================================================
-Версия MODX 1.0.7
+Версия MODX 1.0.8
 
 Сайт
 =====================================================
@@ -32,6 +32,7 @@ rev_005
 Модули
 =====================================================
 добавлено: EvoGallery 1.1.0-beta1 Галереи http://rtfm.modx.com/display/ADDON/EvoGallery
+добавлено: Sypex Dumper 2.0.10 http://sypex.net/ru/products/dumper/downloads/
 
 Сниппеты
 =====================================================
@@ -44,7 +45,7 @@ rev_005
 Плагины
 =====================================================
 изменено: транслитрация псевдонимов по умолчанию
-изменено: ManagerManager обновлен до версии 0.3.11 http://modx.com/extras/package/managermanager
+изменено: ManagerManager обновлен до версии 0.4 http://code.divandesign.ru/modx/managermanager
 изменено: TinyMCE обновлен до версии 3.5.8
 добавлено: CodeMirror 2.25 подсветка синтаксиса http://forums.modx.com/thread/73753/codemirror-for-modx-evolution
 добавлено: CustomSettings 1.0 Добавление своих системных настроек http://community.modx-cms.ru/blog/addons/1778.html

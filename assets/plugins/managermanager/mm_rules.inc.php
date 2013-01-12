@@ -1,4 +1,5 @@
 <?php
+/*
 //group comment_top
 //Роль «Редакторы»
 $editorsRole = 2;
@@ -34,5 +35,5 @@ mm_createTab("SEO", "seoTab", "!$editorsRole", "!$systemTpl", "<p>Здесь в�
 mm_moveFieldsToTab("longtitle,description,ddkeywords,sitemap_changefreq,sitemap_priority", "seoTab", "!$editorsRole");
 //Для редакторов
 mm_hideFields("longtitle,description", "$editorsRole");
-
+*/
 ?>
