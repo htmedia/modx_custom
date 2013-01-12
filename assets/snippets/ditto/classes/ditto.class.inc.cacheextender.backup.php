@@ -844,8 +844,6 @@ class ditto {
 	// ---------------------------------------------------
 
 	function getChildIDs($IDs, $depth) {
-global $modx; return $modx->getChildIds($IDs, $depth); // modified by thebat053, CacheExtender revision:2 
-
 		global $modx;
 		$depth = intval($depth);
 		$kids = array();

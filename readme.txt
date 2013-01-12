@@ -1,4 +1,4 @@
-rev_006
+rev_007
 =====================================================
 Версия MODX 1.0.8
 
@@ -51,6 +51,8 @@ rev_006
 добавлено: CustomSettings 1.0 Добавление своих системных настроек http://community.modx-cms.ru/blog/addons/1778.html
 добавлено: SEO Strict URLs 1.0.1 Редирект дублей http://modx.com/extras/package/seostricturls
 добавлено: DirectResizeLite ресайз изображений http://cad.kurganobl.ru/plagin_directresizelite.html
+добавлено: CacheAccelerator 0.4b Кэширование динамических сниппетов http://community.modx-cms.ru/blog/addons/1621.html
+добавлено: CacheExtender 0.4b Экономия памяти и быстродействие http://community.modx-cms.ru/blog/dev/1625.html
 
 Шаблоны
 =====================================================
