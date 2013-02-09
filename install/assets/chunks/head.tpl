@@ -17,3 +17,4 @@
 	<base href="[(site_url)]" />
 	<meta name="keywords" content="[*seo_keywords*]" />
 	<meta name="description" content="[*seo_description*]" />
+	<link rel="canonical" href="[*seo_canonical*]" />

@@ -24,7 +24,7 @@ mm_renameField('log', 'Дочерние ресурсы отображаются 
 mm_changeFieldHelp('log', 'Это поле используется для папок с большим числом вложенных страниц');
 
 mm_createTab('SEO', 'seo');
-mm_moveFieldsToTab('seo_title,seo_keywords,seo_description,seo_noindex,sitemap_priority,sitemap_changefreq', 'seo');
+mm_moveFieldsToTab('seo_title,seo_keywords,seo_description,seo_noindex,sitemap_priority,sitemap_changefreq,seo_canonical', 'seo');
 
 //mm_widget_evogallery(2, 'Галерея');
 
