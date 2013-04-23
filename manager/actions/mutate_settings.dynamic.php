@@ -54,7 +54,9 @@ $settings['rb_base_dir'] = $rb_base_dir = trim($settings['rb_base_dir']) == '' ?
 $settings['rb_base_url'] =  $rb_base_url = trim($settings['rb_base_url']) == '' ? 'assets/' : $settings['rb_base_url'];
 
 ?>
-
+<style type="text/css">
+	table th {text-align:left; vertical-align:top;}
+</style>
 <script type="text/javascript">
 function checkIM() {
 	im_on = document.settings.im_plugin[0].checked; // check if im_plugin is on
@@ -186,9 +188,9 @@ function confirmLangChange(el, lkey, elupd){
 
 <div style="margin: 0 10px 0 20px">
     <input type="hidden" name="site_id" value="<?php echo $site_id; ?>" />
-    <input type="hidden" name="settings_version" value="<?php echo $modx_version; ?>" />
+    <input type="hidden" name="settings_version" value="<?php echo $modx->getVersionData('version'); ?>" />
     <!-- this field is used to check site settings have been entered/ updated after install or upgrade -->
-    <?php if(!isset($settings_version) || $settings_version!=$modx_version) { ?>
+    <?php if(!isset($settings_version) || $settings_version!=$modx->getVersionData('version')) { ?>
     <div class='sectionBody'><p><?php echo $_lang['settings_after_install']; ?></p></div>
     <?php } ?>
     <script type="text/javascript" src="media/script/tabpane.js"></script>
@@ -204,7 +206,7 @@ function confirmLangChange(el, lkey, elupd){
         <table border="0" cellspacing="0" cellpadding="3">
             <tr>
               <td nowrap class="warning"><b><?php echo $_lang["sitename_title"] ?></b></td>
-              <td ><input onchange="documentDirty=true;" type='text' maxlength='255' style="width: 200px;" name="site_name" value="<?php echo isset($site_name) ? $site_name : "My MODx Site" ; ?>" /></td>
+              <td ><input onchange="documentDirty=true;" type='text' maxlength='255' style="width: 200px;" name="site_name" value="<?php echo isset($site_name) ? $site_name : "My MODX Site" ; ?>" /></td>
             </tr>
             <tr>
               <td width="200">&nbsp;</td>
@@ -628,6 +630,18 @@ function confirmLangChange(el, lkey, elupd){
           <tr id='furlRow6' style="display: <?php echo $friendly_urls==1 ? $displayStyle : 'none' ; ?>">
             <td colspan="2"><div class='split'></div></td>
           </tr>
+<?php if(!isset($make_folders)) $make_folders = '1';?>
+<tr id="furlRow51" class="furlRow row1" style="display: <?php echo $friendly_urls==1 ? $displayStyle : 'none' ; ?>">
+  <th><?php echo $_lang['make_folders_title'] ?></th>
+  <td>
+    <?php echo wrap_label($_lang["yes"],form_radio('make_folders','1', $make_folders=='1'));?><br />
+    <?php echo wrap_label($_lang["no"],form_radio('make_folders','0', $make_folders=='0'));?><br />
+    <?php echo $_lang["make_folders_message"] ?></td>
+</tr> 
+<tr id='furlRow52' style="display: <?php echo $friendly_urls==1 ? $displayStyle : 'none' ; ?>">
+<td colspan="2"><div class='split'></div></td>
+</tr>
+      	
           <tr id='furlRow7' class='row1' style="display: <?php echo $friendly_urls==1 ? $displayStyle : 'none' ; ?>">
             <td nowrap class="warning" valign="top"><b><?php echo $_lang["friendly_alias_title"] ?></b></td>
             <td> <input onchange="documentDirty=true;" type="radio" name="friendly_alias_urls" value="1" <?php echo $friendly_alias_urls=='1' ? 'checked="checked"' : "" ; ?> />
@@ -701,6 +715,20 @@ function confirmLangChange(el, lkey, elupd){
         <h2 class="tab"><?php echo $_lang["settings_users"] ?></h2>
         <script type="text/javascript">tpSettings.addTabPage( document.getElementById( "tabPage4" ) );</script>
         <table border="0" cellspacing="0" cellpadding="3">
+        <?php
+          if(!isset($check_files_onlogin))
+            $check_files_onlogin="index.php\n.htaccess\nmanager/index.php\nmanager/includes/config.inc.php";
+        ?>
+        <tr>
+            <th><?php echo $_lang["check_files_onlogin_title"] ?></th>
+            <td>
+              <textarea name="check_files_onlogin"><?php echo $check_files_onlogin;?></textarea><br />
+                <?php echo $_lang["check_files_onlogin_message"] ?>
+        </td>
+        </tr>
+        <tr>
+          <td colspan="2"><div class='split'></div></td>
+        </tr>
           <tr>
             <td nowrap class="warning"><b><?php echo $_lang["udperms_title"] ?></b></td>
             <td> <input onchange="documentDirty=true;" type="radio" name="use_udperms" value="1" <?php echo $use_udperms=='1' ? 'checked="checked"' : "" ; ?> onclick='showHide(/udPerms/, 1);' />
@@ -748,6 +776,60 @@ function confirmLangChange(el, lkey, elupd){
             <td width="200">&nbsp;</td>
             <td class='comment'><?php echo $_lang["blocked_minutes_message"] ?></td>
           </tr>
+           <tr>
+            <td colspan="2"><div class='split'></div></td>
+          </tr>
+		<tr>
+		<?php if(!isset($error_reporting)) $error_reporting = '1'; ?>
+		<th><?php echo $_lang['a17_error_reporting_title']; ?></th>
+		<td>
+			<?php echo wrap_label($_lang['a17_error_reporting_opt0'], form_radio('error_reporting','0' , $error_reporting==='0'));?><br />
+			<?php echo wrap_label($_lang['a17_error_reporting_opt1'], form_radio('error_reporting','1' , $error_reporting==='1'));?><br />
+			<?php echo wrap_label($_lang['a17_error_reporting_opt2'], form_radio('error_reporting','2' , $error_reporting==='2'));?><br />
+			<?php echo wrap_label($_lang['a17_error_reporting_opt99'],form_radio('error_reporting','99', $error_reporting==='99'));?><br />
+		<?php echo $_lang['a17_error_reporting_msg'];?></td>
+		</tr>
+            <tr>
+              <td colspan="2"><div class='split'></div></td>
+            </tr>
+			<tr>
+			<th><?php echo $_lang["pwd_hash_algo_title"] ?></th>
+			<td>
+			<?php
+				$phm['sel']['BLOWFISH_Y'] = $pwd_hash_algo=='BLOWFISH_Y' ?  1 : 0;
+				$phm['sel']['BLOWFISH_A'] = $pwd_hash_algo=='BLOWFISH_A' ?  1 : 0;
+				$phm['sel']['SHA512']     = $pwd_hash_algo=='SHA512' ?  1 : 0;
+				$phm['sel']['SHA256']     = $pwd_hash_algo=='SHA256' ?  1 : 0;
+				$phm['sel']['MD5']        = $pwd_hash_algo=='MD5' ?  1 : 0;
+				$phm['sel']['UNCRYPT']    = $pwd_hash_algo=='UNCRYPT' ?  1 : 0;
+				if(!isset($pwd_hash_algo) || empty($pwd_hash_algo)) $phm['sel']['UNCRYPT'] = 1;
+				$phm['e']['BLOWFISH_Y'] = $modx->manager->checkHashAlgorithm('BLOWFISH_Y') ? 0:1;
+				$phm['e']['BLOWFISH_A'] = $modx->manager->checkHashAlgorithm('BLOWFISH_A') ? 0:1;
+				$phm['e']['SHA512']     = $modx->manager->checkHashAlgorithm('SHA512') ? 0:1;
+				$phm['e']['SHA256']     = $modx->manager->checkHashAlgorithm('SHA256') ? 0:1;
+				$phm['e']['MD5']        = $modx->manager->checkHashAlgorithm('MD5') ? 0:1;
+				$phm['e']['UNCRYPT']    = $modx->manager->checkHashAlgorithm('UNCRYPT') ? 0:1;
+			?>
+				<?php echo wrap_label('CRYPT_BLOWFISH_Y (salt &amp; stretch)',form_radio('pwd_hash_algo','BLOWFISH_Y',$phm['sel']['BLOWFISH_Y'], '', $phm['e']['BLOWFISH_Y']));?><br />
+				<?php echo wrap_label('CRYPT_BLOWFISH_A (salt &amp; stretch)',form_radio('pwd_hash_algo','BLOWFISH_A',$phm['sel']['BLOWFISH_A'], '', $phm['e']['BLOWFISH_A']));?><br />
+				<?php echo wrap_label('CRYPT_SHA512 (salt &amp; stretch)'    ,form_radio('pwd_hash_algo','SHA512'    ,$phm['sel']['SHA512']    , '', $phm['e']['SHA512']));?><br />
+				<?php echo wrap_label('CRYPT_SHA256 (salt &amp; stretch)'    ,form_radio('pwd_hash_algo','SHA256'    ,$phm['sel']['SHA256']    , '', $phm['e']['SHA256']));?><br />
+				<?php echo wrap_label('CRYPT_MD5 (salt &amp; stretch)'       ,form_radio('pwd_hash_algo','MD5'       ,$phm['sel']['MD5']       , '', $phm['e']['MD5']));?><br />
+				<?php echo wrap_label('UNCRYPT(32 chars salt + SHA-1 hash)'   ,form_radio('pwd_hash_algo','UNCRYPT'   ,$phm['sel']['UNCRYPT']   , '', $phm['e']['UNCRYPT']));?><br />
+				<?php echo $_lang["pwd_hash_algo_message"]?>
+			</td>
+			</tr>
+           <tr>
+            <td colspan="2"><div class='split'></div></td>
+          </tr>
+		<tr>
+			<th><?php echo $_lang["enable_bindings_title"] ?></th>
+			<td>
+				<?php echo wrap_label($_lang["yes"],form_radio('enable_bindings','1',$enable_bindings=='1' || !isset($enable_bindings)));?><br />
+				<?php echo wrap_label($_lang["no"], form_radio('enable_bindings','0',$enable_bindings=='0'));?><br />
+				<?php echo $_lang["enable_bindings_message"] ?>
+		</td>
+		</tr>
            <tr>
             <td colspan="2"><div class='split'></div></td>
           </tr>
@@ -896,6 +978,7 @@ function confirmLangChange(el, lkey, elupd){
       			$dir = dir("media/style/");
       			while ($file = $dir->read()) {
       				if($file!="." && $file!=".." && is_dir("media/style/$file") && substr($file,0,1) != '.') {
+      					if($file==='common') continue;
       					$themename = $file;
       					$selectedtext = $themename==$manager_theme ? "selected='selected'" : "" ;
       	            	echo "<option value='$themename' $selectedtext>".ucwords(str_replace("_", " ", $themename))."</option>";
@@ -1424,4 +1507,14 @@ function get_lang_options($key=null, $selected_lang=null) {
         return $lang_options;
     }
 }
-?>
+
+function form_radio($name,$value,$checked=false,$add='',$disabled=false) {
+	if($checked)  $checked  = ' checked="checked"';
+	if($disabled) $disabled = ' disabled';
+	if($add)     $add = ' ' . $add;
+	return '<input type="radio" name="' . $name . '" value="' . $value . '"' . $checked . $disabled . $add . ' />';
+}
+
+function wrap_label($str='',$object) {
+	return "<label>{$object}\n{$str}</label>";
+}

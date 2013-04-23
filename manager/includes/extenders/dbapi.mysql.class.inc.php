@@ -101,6 +101,11 @@ class DBAPI {
          if ($modx->dumpSQL) {
             $modx->queryCode .= "<fieldset style='text-align:left'><legend>Database connection</legend>" . sprintf("Database connection was created in %2.4f s", $totaltime) . "</fieldset><br />";
          }
+            if (function_exists('mysql_set_charset')) {
+                mysql_set_charset($this->config['charset']);
+            } else {
+                @mysql_query("SET NAMES {$this->config['charset']}", $this->conn);
+            }
          $this->isConnected = true;
          // FIXME (Fixed by line below):
          // this->queryTime = this->queryTime + $totaltime;
@@ -116,13 +121,25 @@ class DBAPI {
       @ mysql_close($this->conn);
    }
 
-   function escape($s) {
-      if (function_exists('mysql_real_escape_string') && $this->conn) {
-         $s = mysql_real_escape_string($s, $this->conn);
-      } else {
-         $s = mysql_escape_string($s);
+   function escape($s, $safecount=0) {
+      
+      $safecount++;
+      if(1000<$safecount) exit("Too many loops '{$safecount}'");
+      
+      if (empty ($this->conn) || !is_resource($this->conn)) {
+         $this->connect();
+       }
+       
+      if(is_array($s)) {
+          if(count($s) === 0) $s = '';
+          else {
+              foreach($s as $i=>$v) {
+                  $s[$i] = $this->escape($v,$safecount);
+              }
+          }
       }
-      return $s;
+      else $s = mysql_real_escape_string($s, $this->conn);
+          return $s;
    }
 
    /**
@@ -154,13 +171,15 @@ class DBAPI {
     * @name:  delete
     *
     */
-   function delete($from,$where='',$fields='') {
+   function delete($from, $where='', $orderby='', $limit = '') {
       if (!$from)
          return false;
       else {
-         $table = $from;
-         $where = ($where != "") ? "WHERE $where" : "";
-         return $this->query("DELETE $fields FROM $table $where");
+         $from = $this->replaceFullTableName($from);
+         if($where != '') $where = "WHERE {$where}";
+         if($orderby !== '') $orderby = "ORDER BY {$orderby}";
+         if($limit != '') $limit = "LIMIT {$limit}";
+         return $this->query("DELETE FROM {$from} {$where} {$orderby} {$limit}");
       }
    }
 
@@ -172,11 +191,11 @@ class DBAPI {
       if (!$from)
          return false;
       else {
-         $table = $from;
+         $from = $this->replaceFullTableName($from);
          $where = ($where != "") ? "WHERE $where" : "";
          $orderby = ($orderby != "") ? "ORDER BY $orderby " : "";
          $limit = ($limit != "") ? "LIMIT $limit" : "";
-         return $this->query("SELECT $fields FROM $table $where $orderby $limit");
+         return $this->query("SELECT $fields FROM $from $where $orderby $limit");
       }
    }
 
@@ -188,6 +207,7 @@ class DBAPI {
       if (!$table)
          return false;
       else {
+         $table = $this->replaceFullTableName($table);
          if (!is_array($fields))
             $flds = $fields;
          else {
@@ -220,11 +240,13 @@ class DBAPI {
             $flds = "(" . implode(",", $keys) . ") " .
              (!$fromtable && $values ? "VALUES('" . implode("','", $values) . "')" : "");
             if ($fromtable) {
+               $fromtable = $this->replaceFullTableName($fromtable);
                $where = ($where != "") ? "WHERE $where" : "";
                $limit = ($limit != "") ? "LIMIT $limit" : "";
                $sql = "SELECT $fromfields FROM $fromtable $where $limit";
             }
          }
+         $intotable = $this->replaceFullTableName($intotable);
          $rt = $this->query("INSERT INTO $intotable $flds $sql");
          $lid = $this->getInsertId();
          return $lid ? $lid : $rt;
@@ -499,6 +521,31 @@ class DBAPI {
     */
    function getVersion() {
        return mysql_get_server_info();
+   }
+   
+   /**
+    * @name replaceFullTableName
+    * @desc  Get full table name. Append table name and table prefix.
+    * 
+    * @param string $str
+    * @return string 
+    */
+   function replaceFullTableName($str,$force=null) {
+       
+       $str = trim($str);
+       $dbase  = trim($this->config['dbase'],'`');
+       $prefix = $this->config['table_prefix'];
+       if(!empty($force))
+       {
+           $result = "`{$dbase}`.`{$prefix}{$str}`";
+       }
+       elseif(strpos($str,'[+prefix+]')!==false)
+       {
+           $result = preg_replace('@\[\+prefix\+\]([0-9a-zA-Z_]+)@', "`{$dbase}`.`{$prefix}$1`", $str);
+       }
+       else $result = $str;
+       
+       return $result;
    }
 }
 ?>

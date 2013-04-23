@@ -1,30 +1,33 @@
 <?php
-
-define('MODX_BASE_PATH', realpath('../../../../'));
+$selfpos = strlen('manager/media/browser/mcpuk/browser.php');
+$base_path = substr(str_replace('\\','/',__FILE__), 0, $selfpos * -1);
+define('MODX_BASE_PATH', $base_path);
 $rb = new FBROWSER();
 $ph = array();
 $ph['seturl_js'] = $rb->seturl_js();
 $output = $rb->render_fbrowser($ph);
+header('X-UA-Compatible: IE=EmulateIE7');
 echo $output;
 
 class FBROWSER
 {
 	function seturl_js()
 	{
-		$seturl_js_filename = 'seturl_js_'  . htmlspecialchars($_GET['editor']) . '.inc';
+		$editor = (isset($_GET['editor'])) ? $_GET['editor'] : '';
+		$seturl_js_filename = ($editor!=='' && !stristr($editor,"..")) ? 'seturl_js_'  . htmlspecialchars($editor) . '.inc' : '';
 		$seturl_js_path = MODX_BASE_PATH . 'assets/plugins/';
 		
-		if(file_exists($seturl_js_path . $seturl_js_filename))
+		if($seturl_js_filename!='' && file_exists($seturl_js_path . $seturl_js_filename))
 		{
 			$result = file_get_contents($seturl_js_path . $seturl_js_filename);
 		}
 		else
 		{
-			$editor_path = htmlspecialchars($_GET['editorpath'], ENT_QUOTES);
-			switch($_GET['editor'])
+			switch($editor)
 			{
 				case 'tinymce' :
 				case 'tinymce3':
+					$editor_path = isset($_GET['editorpath']) ? htmlspecialchars($_GET['editorpath'], ENT_QUOTES) : '';
 					$result = file_get_contents('seturl_js_tinymce.inc');
 					$result = str_replace('[+editor_path+]', $editor_path, $result);
 					break;

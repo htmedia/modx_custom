@@ -14,7 +14,7 @@ function mm_hideTemplates($tplIds, $roles='', $templates='') {
 			
 			$tplIds = makeArray($tplIds);
 
-        	if ($e->name == 'OnDocFormRender' && useThisRule($roles, $templates)) {
+        	if (useThisRule($roles, $templates)) {
 				
 				$output = " // ----------- Hide templates -------------- \n";
 

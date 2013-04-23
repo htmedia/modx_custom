@@ -478,7 +478,7 @@ while ($row = mysql_fetch_assoc($rs)) {
 	    <td> <select name="manager_language" size="1" class="inputBox" onchange="documentDirty=true">
 	    <option value=""> </option>
 	    <?php
-$activelang = !empty($usersettings['manager_language']) ? $usersettings['manager_language'] : $manager_language;
+$activelang = !empty($usersettings['manager_language']) ? $usersettings['manager_language'] : '';
 $dir = dir("includes/lang");
 while ($file = $dir->read()) {
 	if (strpos($file, ".inc.php") > 0) {
@@ -569,6 +569,7 @@ $dir->close();
 		while ($file = $dir->read()) {
 			if ($file != "." && $file != ".." && is_dir("media/style/$file") && substr($file,0,1) != '.') {
 				$themename = $file;
+				if($themename==='common') continue;
 				$attr = 'value="'.$themename.'" ';
 				if (isset($usersettings['manager_theme']) && $themename == $usersettings['manager_theme'])
 					$attr .= 'selected="selected" ';

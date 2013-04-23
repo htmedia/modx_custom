@@ -299,12 +299,12 @@ class ditto {
 		}
 		
 		if (in_array("content",$this->fields["display"]["db"]) && $this->format != "html") {
-			$resource['content'] = $this->relToAbs($resource['content'], $modx->config['site_url']);
-		}
-		
-		if (in_array("introtext",$this->fields["display"]["db"]) && $this->format != "html") {
-			$resource['introtext'] = $this->relToAbs($resource['introtext'], $modx->config['site_url']);
-		}
+            $placeholders['content'] = $this->relToAbs($resource['content'], $modx->config['site_url']);
+        }
+         
+        if (in_array("introtext",$this->fields["display"]["db"]) && $this->format != "html") {
+            $placeholders['introtext'] = $this->relToAbs($resource['introtext'], $modx->config['site_url']);
+        }
 		
 		$customPlaceholders = $ph;
 		// set custom placeholder
@@ -495,7 +495,7 @@ class ditto {
 	// Get the author name, or if not available the username
 	// ---------------------------------------------------
 	
-	function getAuthor($createdby) {
+	public static function getAuthor($createdby) {
 		global $modx;
 		
 		$user = false;
@@ -844,8 +844,6 @@ class ditto {
 	// ---------------------------------------------------
 
 	function getChildIDs($IDs, $depth) {
-global $modx; return $modx->getChildIds($IDs, $depth); // modified by thebat053, CacheExtender revision:2 
-
 		global $modx;
 		$depth = intval($depth);
 		$kids = array();
@@ -1037,7 +1035,7 @@ global $modx; return $modx->getChildIds($IDs, $depth); // modified by thebat053,
 	// Build a URL with regard to Ditto ID
 	// ---------------------------------------------------
 	
-	function buildURL($args,$id=false,$dittoIdentifier=false) {
+	public static function buildURL($args,$id=false,$dittoIdentifier=false) {
 		global $modx, $dittoID;
 			$dittoID = ($dittoIdentifier !== false) ? $dittoIdentifier : $dittoID;
 			$query = array();

@@ -88,12 +88,12 @@ class CJot {
 		$this->config["placeholders"] = !is_null($this->Get("placeholders")) ? intval($this->Get("placeholders")) : 0;
 		$this->config["authorid"] = !is_null($this->Get("authorid")) ? intval($this->Get("authorid")) : $modx->documentObject["createdby"];
 		$this->config["title"] = !is_null($this->Get("title")) ? $this->Get("title") : $modx->documentObject["longtitle"];
-		$this->config["subject"]["subscribe"] = !is_null($this->Get("subjectSubscribe")) ? $this->Get("subjectSubscribe") : "New reply to a topic you are watching";
-		$this->config["subject"]["moderate"] = !is_null($this->Get("subjectModerate")) ? $this->Get("subjectModerate") : "New reply to a topic you are moderating";
-		$this->config["subject"]["author"] = !is_null($this->Get("subjectAuthor")) ? $this->Get("subjectAuthor") : "New comment on your post";
+		$this->config["subject"]["subscribe"] = !is_null($this->Get("subjectSubscribe")) ? $this->Get("subjectSubscribe") : "Новый комментарий на вашу тему";
+		$this->config["subject"]["moderate"] = !is_null($this->Get("subjectModerate")) ? $this->Get("subjectModerate") : "Новый ответ на тему, которую вы администрируте";
+		$this->config["subject"]["author"] = !is_null($this->Get("subjectAuthor")) ? $this->Get("subjectAuthor") : "Добавлен новый комментарий.";
 		$this->config["debug"] = !is_null($this->Get("debug")) ? intval($this->Get("debug")) : 0;
 		$this->config["output"] = !is_null($this->Get("output")) ? intval($this->Get("output")) : 1;
-		$this->config["validate"] = !is_null($this->Get("validate")) ? $this->Get("validate") : "content:You forgot to enter a comment.";
+		$this->config["validate"] = !is_null($this->Get("validate")) ? $this->Get("validate") : "content:Вы не ввели комментарий.";
 		
 		// CSS Settings (basic)
 		$this->config["css"]["include"] = !is_null($this->Get("css")) ? intval($this->Get("css")) : 1;
@@ -498,7 +498,8 @@ class CJot {
 						// Store field data
 						switch($n) {
 							case 'title': // Title field
-								if ($v == '') $v = "Re: " . $this->config["title"];
+								//if ($v == '') $v = "Re: " . $this->config["title"];
+								if ($v == '') $v = $this->config["title"];
 								$this->form["field"]["title"] = $v;
 								$pObj->Set("title",$v); 
 								break;

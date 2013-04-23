@@ -3,7 +3,7 @@
 # including for unexpected logouts in multi-server/cloud environments
 # and especially for the first three commented out rules
 
-#php_flag register_globals Off
+php_flag register_globals Off
 AddDefaultCharset utf-8
 #php_value date.timezone Europe/Moscow
 
@@ -17,8 +17,8 @@ RewriteRule .* - [F,L]
 
 # Rewrite domain.com -> www.domain.com -- used with SEO Strict URLs plugin
 #RewriteCond %{HTTP_HOST} .
-#RewriteCond %{HTTP_HOST} !^www\.example\.ru [NC]
-#RewriteRule (.*) http://www.example.ru/$1 [R=301,L]
+#RewriteCond %{HTTP_HOST} !^www\.example\.com [NC]
+#RewriteRule (.*) http://www.example.com/$1 [R=301,L]
 
 # Exclude /assets and /manager directories and images from rewrite rules
 RewriteRule ^(manager|assets)/*$ - [L]

@@ -21,10 +21,10 @@ var DatePicker = new Class({
 
         // Options defaults
         this.dayChars = 1; // number of characters in day names abbreviation
-        this.dayNames = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+        this.dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         this.daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
         this.format = 'dd-mm-yyyy hh:mm:00';
-        this.monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+        this.monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         this.startDay = 7; // 1 = week starts on Monday, 7 = week starts on Sunday
         this.yearOrder = 'asc';
         this.yearRange = 10;
@@ -321,7 +321,7 @@ var DatePicker = new Class({
     /* Remove the calendar from the page */
     remove: function(dp){
         dp.active = false;
-        if (window.opera) dp.container.empty();
+        if (window.opera && dp.container) dp.container.empty();
         else if (dp.container) dp.container.remove();
         dp.calendar = false;
         dp.container = false;

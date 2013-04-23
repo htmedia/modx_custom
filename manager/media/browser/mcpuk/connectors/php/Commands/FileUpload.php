@@ -30,16 +30,24 @@ class FileUpload {
 		$this->raw_cwd=$cwd;
 		$this->actual_cwd=str_replace("//","/",($this->fckphp_config['UserFilesPath']."/$type/".$this->raw_cwd));
 		$this->real_cwd=str_replace("//","/",($this->fckphp_config['basedir']."/".$this->actual_cwd));
-	}
-	
-	 function translit($text) {
-        $rus = array("а","А","б","Б","в","В","г","Г","д","Д","е","Е","ё","Ё","ж", "Ж",  "з","З","и","И","й","Й","к","К","л","Л","м","М","н","Н","о","О","п","П","р","Р", "с","С","т","Т","у","У","ф","Ф","х","Х","ц","Ц","ч", "Ч", "ш", "Ш", "щ",  "Щ", "ъ","Ъ", "ы","Ы","ь","Ь","э","Э","ю", "Ю", "я","Я",'/',' ');
-        $angl =array("a","A","b","B","v","V","g","G","d","D","e","E","e","E", "zh","ZH","z","Z","i","I","j","J","k","K","l","L","m","M","n","N","o","O", "p","P","r","R","s","S","t","T","u","U","f","F","h","H","c","C","ch","CH", "sh","SH","sch","SCH","", "", "y","Y","","","e","E","ju","JU","ja","JA",'','');
-        $text = str_replace($rus,$angl,$text);
-        return $text;
+        define('MODX_API_MODE', true);
+        define("IN_MANAGER_MODE", "true");
+        $self = 'manager/media/browser/mcpuk/connectors/php/Commands/FileUpload.php';
+        global $modx;
+        $base_path = str_replace($self,'',str_replace('\\','/',__FILE__));
+        $mtime = microtime();
+        include_once("{$base_path}manager/includes/config.inc.php");
+        include_once("{$base_path}manager/includes/document.parser.class.inc.php");
+        $modx = new DocumentParser;
+        $mtime = explode(" ",$mtime);
+        $modx->tstart = $mtime[1] + $mtime[0];;
+        $modx->mstart = memory_get_usage();
+        startCMSSession();
+        $modx->getSettings();
 	}
 
 	function run() {
+		global $modx;
 		//If using CGI Upload script, get file info and insert into $_FILE array
 		if 	(
 				(sizeof($_FILES)==0) && 
@@ -61,15 +69,14 @@ class FileUpload {
 		header ("content-type: text/html");
 		if (sizeof($_FILES)>0) {
 			if (array_key_exists("NewFile",$_FILES)) {
-				if ($_FILES['NewFile']['size']<($typeconfig['MaxSize']*1024)) {
+				if ($_FILES['NewFile']['size']<$typeconfig['MaxSize']) {
 
-					//$filename=basename(str_replace("\\","/",$_FILES['NewFile']['name']));
-					$filename=basename(str_replace("\\","/",$this->translit($_FILES['NewFile']['name'])));
-					//if($this->modx->config['clean_uploaded_filename']) {
-					//	$nameparts = explode('.', $filename);
-					//	array_map(array($this->modx, 'stripAlias'), $nameparts);
-					//	$filename = implode($nameparts);
-					//}
+					$filename=basename(str_replace("\\","/",$_FILES['NewFile']['name']));
+					if($modx->config['clean_uploaded_filename']==1) {
+						$nameparts = explode('.', $filename);
+						$nameparts = array_map(array($modx, 'stripAlias'), $nameparts, array('file_browser'));
+						$filename = implode('.', $nameparts);
+					}
 					
 					$lastdot=strrpos($filename,".");
 					

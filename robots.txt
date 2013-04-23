@@ -8,10 +8,7 @@ Disallow: /assets/plugins/
 Disallow: /assets/snippets/
 Disallow: /install/
 Disallow: /manager/
-Disallow: /?
-Disallow: /*?id=
-Disallow: /info*
-Host: example.ru
+Host: example.com
 
 User-agent: *
 Disallow: /assets/cache/
@@ -22,9 +19,6 @@ Disallow: /assets/modules/
 Disallow: /assets/plugins/
 Disallow: /assets/snippets/
 Disallow: /install/
-Disallow: /manager/
-Disallow: /?
-Disallow: /*?id=
-Disallow: /info*
+Disallow: /manager/	
 
-Sitemap: http://example.ru/sitemap.xml
+Sitemap: http://example.com/sitemap.xml
