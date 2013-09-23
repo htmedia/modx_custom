@@ -3,11 +3,11 @@
  * multiTV
  * 
  * @category 	snippet
- * @version 	1.4.7
+ * @version 	1.6
  * @license 	http://www.gnu.org/copyleft/gpl.html GNU Public License (GPL)
  * @author		Jako (thomas.jakobi@partout.info)
  *
- * @internal    description: <strong>1.4.7</strong> Transform template variables into a sortable multi item list.
+ * @internal    description: <strong>1.6</strong> Transform template variables into a sortable multi item list.
  * @internal    snippet code: return include(MODX_BASE_PATH.'assets/tvs/multitv/multitv.snippet.php');
  */
 if (MODX_BASE_PATH == '') {
@@ -17,16 +17,12 @@ if (MODX_BASE_PATH == '') {
 global $modx;
 
 // set customtv (base) path
-define(MTV_PATH, 'assets/tvs/multitv/');
-define(MTV_BASE_PATH, MODX_BASE_PATH . MTV_PATH);
+define('MTV_PATH', 'assets/tvs/multitv/');
+define('MTV_BASE_PATH', MODX_BASE_PATH . MTV_PATH);
 
 // include classfile
 if (!class_exists('multiTV')) {
 	include MTV_BASE_PATH . 'multitv.class.php';
-}
-// include chunke class
-if (!class_exists('multitvChunkie')) {
-	include (MTV_BASE_PATH . '/includes/chunkie.class.inc.php');
 }
 
 // load template variable settings
@@ -36,6 +32,9 @@ $tvSettings = $modx->db->getRow($res);
 if (!$tvSettings) {
 	return 'Template variable ' . $tvName . ' does not exists';
 }
+
+// pre-init template configuration
+$tvSettings['tpl_config'] = (isset($tplConfig)) ? $tplConfig : '';
 
 // init multiTV class
 $multiTV = new multiTV($tvSettings);
@@ -48,35 +47,42 @@ $outerTpl = isset($outerTpl) ? $outerTpl : (isset($templates['outerTpl']) ? '@CO
 $emptyOutput = (isset($emptyOutput) && !$emptyOutput) ? FALSE : TRUE;
 $rowTpl = isset($rowTpl) ? $rowTpl : (isset($templates['rowTpl']) ? '@CODE:' . $templates['rowTpl'] : '@CODE:<option value="[+value+]">[+key+]</option>');
 $display = isset($display) ? $display : 5;
+$offset = isset($offset) ? intval($offset) : 0;
 $rows = (isset($rows) && ($rows != 'all')) ? explode(',', $rows) : 'all';
-$toPlaceholder = (isset($toPlaceholder) && $toPlaceholder) ? TRUE : FALSE;
+$toPlaceholder = (isset($toPlaceholder) && $toPlaceholder != '') ? $toPlaceholder : FALSE;
 $randomize = (isset($randomize) && $randomize) ? TRUE : FALSE;
+$reverse = (isset($reverse) && $reverse) ? TRUE : FALSE;
+$orderBy = isset($orderBy) ? $orderBy : '';
+list($sortBy, $sortDir) = explode(" ", $orderBy);
 $published = (isset($published)) ? $published : '1';
+$outputSeparator = (isset($outputSeparator)) ? $outputSeparator : '';
 
 // replace masked placeholder tags (for templates that are set directly set in snippet call by @CODE)
 $maskedTags = array('((' => '[+', '))' => '+]');
 $outerTpl = str_replace(array_keys($maskedTags), array_values($maskedTags), $outerTpl);
 $rowTpl = str_replace(array_keys($maskedTags), array_values($maskedTags), $rowTpl);
 
+// get template variable always if logged into manager
+$published = isset($_SESSION['mgrValidated'])? '2' : $published;
 // get template variable
 switch (strtolower($published)) {
-	case '0' :
-	case 'false' :
+	case '0':
+	case 'false':
 		$tvOutput = $modx->getTemplateVarOutput(array($tvName), $docid, '0');
 		break;
-	case '1' :
+	case '1':
 	case '2':
 	case 'true':
 		$tvOutput = $modx->getTemplateVarOutput(array($tvName), $docid, '1');
-		if ($tvOutput == false && $published == '2') {
+		if ($tvOutput == FALSE && $published == '2') {
 			$tvOutput = $modx->getTemplateVarOutput(array($tvName), $docid, '0');
 		}
 		break;
 }
 $tvOutput = $tvOutput[$tvName];
-$tvOutput = json_decode($tvOutput);
-if (is_object($tvOutput)) {
-	$tvOutput = $tvOutput->fieldValue;
+$tvOutput = json_decode($tvOutput, TRUE);
+if (isset($tvOutput['fieldValue'])) {
+	$tvOutput = $tvOutput['fieldValue'];
 }
 $countOutput = count($tvOutput);
 
@@ -89,6 +95,7 @@ if ($countOutput) {
 		}
 	}
 }
+
 // stop if there is no output
 if (!$countOutput || $firstEmpty) {
 	if ($emptyOutput) {
@@ -96,7 +103,7 @@ if (!$countOutput || $firstEmpty) {
 		return '';
 	} else {
 		// output empty outer template
-		$parser = new multitvChunkie($outerTpl);
+		$parser = new evoChunkie($outerTpl);
 		$parser->AddVar('wrapper', '');
 		$output = $parser->Render();
 		if ($toPlaceholder) {
@@ -106,53 +113,73 @@ if (!$countOutput || $firstEmpty) {
 	}
 }
 
-// random output
+// random or sort output
 if ($randomize) {
 	shuffle($tvOutput);
+} elseif ($reverse) {
+	$tvOutput = array_reverse($tvOutput);
+} elseif (!empty($sortBy)) {
+	$multiTV->sort($tvOutput, trim($sortBy), trim($sortDir));
 }
 
-// check for display all
-$display = ($display != 'all') ? intval($display) : $countOutput;
+// check for display all regarding selected rows count and offset
+$countOutput = ($rows === 'all') ? $countOutput : count($rows);
+$display = ($display !== 'all') ? intval($display) : $countOutput;
+$display = (($display + $offset) < $countOutput) ? $display : $countOutput - $offset;
 
 // output
-$columnCount = count($columns);
-$wrapper = '';
-$i = 1;
-$placeholder = array();
+$wrapper = array();
+$i = $iteration = 1;
+$class = 'first';
 // rowTpl output 
 foreach ($tvOutput as $value) {
 	if ($display == 0) {
 		break;
 	}
-	if ($rows != 'all') {
+	if ($rows !== 'all' && !in_array($i, $rows)) {
 		// output only selected rows 
-		if (!in_array($i, $rows)) {
-			$i++;
-			continue;
-		}
+		$i++;
+		continue;
 	}
-	$parser = new multitvChunkie($rowTpl);
-	for ($j = 0; $j < $columnCount; $j++) {
-		$parser->AddVar($columns[$j], $value[$j]);
+	if ($offset) {
+		// don't show the offset rows
+		$offset--;
+		$i++;
+		continue;
 	}
-	$parser->AddVar('iteration', $i);
+	$class = ($display != 1) ? $class : trim($class . ' last');
+	$parser = new evoChunkie($rowTpl);
+	foreach ($value as $key => $fieldvalue) {
+		$fieldname = (is_int($key)) ? $columns[$key] : $key;
+		$parser->AddVar($fieldname, $fieldvalue);
+	}
+	$parser->AddVar('iteration', $iteration);
+	$parser->AddVar('row', array('number' => $i, 'class' => $class, 'total' => $countOutput));
 	$parser->AddVar('docid', $docid);
-	$placeholder[$i] = $parser->Render();
+	$placeholder = $parser->Render();
 	if ($toPlaceholder) {
-		$modx->setPlaceholder($tvName . '.' . $i, $placeholder[$i]);
+		$modx->setPlaceholder($toPlaceholder . '.' . $i, $placeholder);
 	}
-	$wrapper .= $placeholder[$i];
+	$wrapper[] = $placeholder;
 	$i++;
+	$iteration++;
 	$display--;
+	$class = '';
 }
-// wrap rowTpl output in outerTpl
-$parser = new multitvChunkie($outerTpl);
-$parser->AddVar('wrapper', $wrapper);
-$parser->AddVar('docid', $docid);
-$output = $parser->Render();
+if ($emptyOutput && !count($wrapper)) {
+	// output nothing
+	$output = '';
+} else {
+	// wrap rowTpl output in outerTpl
+	$parser = new evoChunkie($outerTpl);
+	$parser->AddVar('wrapper', implode($outputSeparator, $wrapper));
+	$parser->AddVar('rows', array('offset' => $offset, 'total' => $countOutput));
+	$parser->AddVar('docid', $docid);
+	$output = $parser->Render();
+}
 
 if ($toPlaceholder) {
-	$modx->setPlaceholder($tvName, $output);
+	$modx->setPlaceholder($toPlaceholder, $output);
 	return '';
 } else {
 	return $output;

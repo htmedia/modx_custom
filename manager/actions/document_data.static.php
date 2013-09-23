@@ -1,5 +1,5 @@
 <?php
-if (IN_MANAGER_MODE!='true') die("<b>INCLUDE_ORDERING_ERROR</b><br /><br />Please use the MODx Content Manager instead of accessing this file directly.");
+if (IN_MANAGER_MODE!='true') die("<b>INCLUDE_ORDERING_ERROR</b><br /><br />Please use the MODX Content Manager instead of accessing this file directly.");
 
 if (isset($_REQUEST['id']))
         $id = (int)$_REQUEST['id'];
@@ -38,8 +38,8 @@ $sql = 'SELECT DISTINCT sc.* '.
        'LEFT JOIN '.$tbl_document_groups.' AS dg ON dg.document = sc.id '.
        'WHERE sc.id =\''.$id.'\' '.
        'AND ('.$access.')';
-$rs = mysql_query($sql);
-$limit = mysql_num_rows($rs);
+$rs = $modx->db->query($sql);
+$limit = $modx->db->getRecordCount($rs);
 if ($limit > 1) {
 	echo "<p>Internal System Error...</p>",
 	     "<p>More results returned than expected. </p>",
@@ -49,24 +49,24 @@ if ($limit > 1) {
 	$e->setError(3);
 	$e->dumpError();
 }
-$content = mysql_fetch_assoc($rs);
+$content = $modx->db->getRow($rs);
 
 /**
  * "General" tab setup
  */
 // Get Creator's username
-$rs = mysql_query('SELECT username FROM '.$tbl_manager_users.' WHERE id=\''.$content['createdby'].'\'');
-if ($row = mysql_fetch_assoc($rs))
+$rs = $modx->db->query('SELECT username FROM '.$tbl_manager_users.' WHERE id=\''.$content['createdby'].'\'');
+if ($row = $modx->db->getRow($rs))
 	$createdbyname = $row['username'];
 
 // Get Editor's username
-$rs = mysql_query('SELECT username FROM '.$tbl_manager_users.' WHERE id=\''.$content['editedby'].'\'');
-if ($row = mysql_fetch_assoc($rs))
+$rs = $modx->db->query('SELECT username FROM '.$tbl_manager_users.' WHERE id=\''.$content['editedby'].'\'');
+if ($row = $modx->db->getRow($rs))
 	$editedbyname = $row['username'];
 
 // Get Template name
-$rs = mysql_query('SELECT templatename FROM '.$tbl_site_templates.' WHERE id=\''.$content['template'].'\'');
-if ($row = mysql_fetch_assoc($rs))
+$rs = $modx->db->query('SELECT templatename FROM '.$tbl_site_templates.' WHERE id=\''.$content['template'].'\'');
+if ($row = $modx->db->getRow($rs))
 	$templatename = $row['templatename'];
 
 // Set the item name for logging
@@ -77,11 +77,11 @@ $keywords = array();
 $sql = 'SELECT k.keyword FROM '.$tbl_site_keywords.' AS k, '.$tbl_keyword_xref.' AS x '.
        'WHERE k.id = x.keyword_id AND x.content_id = \''.$id.'\' '.
        'ORDER BY k.keyword ASC';
-$rs = mysql_query($sql);
-$limit = mysql_num_rows($rs);
+$rs = $modx->db->query($sql);
+$limit = $modx->db->getRecordCount($rs);
 if ($limit > 0) {
 	for ($i = 0; $i < $limit; $i++) {
-		$row = mysql_fetch_assoc($rs);
+		$row = $modx->db->getRow($rs);
 		$keywords[$i] = $row['keyword'];
 	}
 }
@@ -92,11 +92,11 @@ $sql = 'SELECT meta.id, meta.name, meta.tagvalue '.
        'FROM '.$tbl_site_metatags.' AS meta '.
        'LEFT JOIN '.$tbl_site_content_metatags.' AS sc ON sc.metatag_id = meta.id '.
        'WHERE sc.content_id=\''.$content['id'].'\'';
-$rs = mysql_query($sql);
-$limit = mysql_num_rows($rs);
+$rs = $modx->db->query($sql);
+$limit = $modx->db->getRecordCount($rs);
 if ($limit > 0) {
 	for ($i = 0; $i < $limit; $i++) {
-		$row = mysql_fetch_assoc($rs);
+		$row = $modx->db->getRow($rs);
 		$metatags_selected[] = $row['name'].': <i>'.$row['tagvalue'].'</i>';
 	}
 }
@@ -107,7 +107,7 @@ if ($limit > 0) {
 $maxpageSize = $modx->config['number_of_results'];
 define('MAX_DISPLAY_RECORDS_NUM',$maxpageSize);
 
-if (!class_exists('makeTable')) include_once $modx->config['base_path'].'manager/includes/extenders/maketable.class.php';
+if (!class_exists('makeTable')) include_once $modx->config['site_manager_path'].'includes/extenders/maketable.class.php';
 $childsTable = new makeTable();
 
 // Get child document count
@@ -138,6 +138,9 @@ if ($numRecords > 0) {
 		'<option value="pub_date"'.(($sort=='pub_date') ? ' selected' : '').'>'.$_lang["page_data_publishdate"].'</option>'.
 		'<option value="pagetitle"'.(($sort=='pagetitle') ? ' selected' : '').'>'.$_lang['pagetitle'].'</option>'.
 		'<option value="menuindex"'.(($sort=='menuindex') ? ' selected' : '').'>'.$_lang['resource_opt_menu_index'].'</option>'.
+//********  resource_opt_is_published - //
+		'<option value="published"'.(($sort=='published') ? ' selected' : '').'>'.$_lang['resource_opt_is_published'].'</option>'.
+//********//
 	'</select>';
 	$filter_dir='<select size="1" name="dir" onchange="document.location=\'index.php?a=3&id='.$id.'&sort='.$sort.'&dir=\'+this.options[this.selectedIndex].value">'.
 		'<option value="DESC"'.(($dir=='DESC') ? ' selected' : '').'>'.$_lang['sort_desc'].'</option>'.
@@ -147,11 +150,11 @@ if ($numRecords > 0) {
 		// sql error
 		$e->setError(1);
 		$e->dumpError();
-		include($modx->config['base_path'].'manager/includes/footer.inc.php');
+		include($modx->config['site_manager_path'].'includes/footer.inc.php');
 		exit;
 	} else {
 		$resource = array();
-		while($row = $modx->fetchRow($rs)){
+		while($row = $modx->db->getRow($rs)){
 			$resource[] = $row;
 		}
 
@@ -180,8 +183,15 @@ if ($numRecords > 0) {
 
 		$limitClause = $childsTable->handlePaging();
 
+$sd=isset($_REQUEST['dir'])?'&amp;dir='.$_REQUEST['dir']:'&amp;dir=DESC';
+$sb=isset($_REQUEST['sort'])?'&amp;sort='.$_REQUEST['sort']:'&amp;sort=createdon';
+$pg=isset($_REQUEST['page'])?'&amp;page='.(int)$_REQUEST['page']:'';
+$add_path=$sd.$sb.$pg;
+
+
 		$listDocs = array();
 		foreach($resource as $k => $children){
+			/*
 			$listDocs[] = array(
 				'docid' =>  $children['id'],
 				'title' =>  (($children['deleted'] ? ('<s>'.$children['pagetitle'].'</s>') : ( ($modx->hasPermission('edit_document')) ? ('<a href="index.php?a=27&amp;id='.$children['id'].'">' . $children['pagetitle'] . '</a>') : $children['pagetitle'] ))),
@@ -194,6 +204,25 @@ if ($numRecords > 0) {
 				(($modx->hasPermission('delete_document')) ? '&nbsp;<a href="index.php?a=6&amp;id='.$children['id'].'" title="'.$_lang['delete_resource'].'"><img src="' . $_style["icons_delete_document"] .'" /></a>&nbsp;<a href="index.php?a=63&amp;id='.$children['id'].'" title="'.$_lang['undelete_resource'].'"><img 
 				src="' . $_style["icons_undelete_resource"] .'" /></a>' : ''),
 			);
+			*/
+			
+			// дописываем в заголовок класс для неопубликованных плюс по всем ссылкам обратный путь 
+			// для сохранения сортировки
+			$icon_pub_unpub = (!$children['published']) ? '<a href="index.php?a=61&amp;id='.$children['id'].$add_path.'" title="'.$_lang["publish_resource"].'"><img src="' . $_style["icons_publish_document"] .'" /></a>' : '<a 
+				href="index.php?a=62&amp;id='.$children['id'].$add_path.'" title="'.$_lang["unpublish_resource"].'"><img src="' . $_style["icons_unpublish_resource"] .'" /></a>';
+			$icon_del_undel = (!$children['deleted']) ? '<a href="index.php?a=6&amp;id='.$children['id'].$add_path.'" title="'.$_lang['delete_resource'].'"><img src="' . $_style["icons_delete_document"] .'" /></a>' : '<a href="index.php?a=63&amp;id='.$children['id'].$add_path.'" title="'.$_lang['undelete_resource'].'"><img src="' . $_style["icons_undelete_resource"] .'" /></a>';
+			$listDocs[] = array(
+				'docid' =>  $children['id'],
+				'title' =>  (($children['deleted'] ? ('<span class="deleted">'.$children['pagetitle'].'</span>') : ( ($modx->hasPermission('edit_document')) ? ('<a href="index.php?a=27&amp;id='.$children['id'].$add_path.'">' . ($children['published']?$children['pagetitle']:'<span class=unpublish>'.$children['pagetitle'].'</span>') . '</a>') : $children['pagetitle'] ))),
+				'createdon' =>  ($modx->toDateFormat($children['createdon']+$server_offset_time,'dateOnly')),
+				'pub_date' =>  ($children['pub_date']? ($modx->toDateFormat($children['pub_date']+$server_offset_time,'dateOnly')) : ''),
+				'status' => ($children['published'] == 0) ? '<span class="unpublishedDoc">'.$_lang['page_data_unpublished'].'</span>' : '<span class="publishedDoc">'.$_lang['page_data_published'].'</span>',
+				'edit' =>   (($modx->hasPermission('edit_document')) ? '&nbsp;<a href="index.php?a=27&amp;id='.$children['id'].$add_path.'" title="'.$_lang['edit'].'"><img src="' . $_style["icons_save"] .'" /></a>&nbsp;<a href="index.php?a=51&amp;id='.$children['id'].$add_path.'" title="'.$_lang['move'].'"><img 
+				src="' . $_style["icons_move_document"] .'" /></a>&nbsp;'.$icon_pub_unpub .'&nbsp;': '') .
+				(($modx->hasPermission('delete_document')) ? '&nbsp;' . $icon_del_undel : ''),
+			);
+			
+			/****************/
 		}
 
 		$childsTable->createPagingNavigation($numRecords,'a=3&id='.$content['id'].'&dir='.$dir.'&sort='.$sort);
@@ -248,7 +277,6 @@ function movedocument() {
 	  </ul>
 	</div>
 
-<div class="sectionHeader"><?php echo $_lang['page_data_title']?></div>
 <div class="sectionBody">
 
 <div class="tab-pane" id="childPane">
@@ -345,7 +373,28 @@ function movedocument() {
 	echo $children_output."\n";
 ?>
 	</div><!-- end tab-page -->
-
+<?php if($modx->config['cache_type'] !=2) { ?>
+	<!-- Page Source -->
+	<div class="tab-page" id="tabSource">
+		<h2 class="tab"><?php echo $_lang['page_data_source']?></h2>
+		<script type="text/javascript">docSettings.addTabPage( document.getElementById( "tabSource" ) );</script>
+		<?php
+		$buffer = "";
+		$filename = $modx->config['base_path']."assets/cache/docid_".$id.".pageCache.php";
+		$handle = @fopen($filename, "r");
+		if(!$handle) {
+			$buffer = $_lang['page_data_notcached'];
+		} else {
+			while (!feof($handle)) {
+				$buffer .= fgets($handle, 4096);
+			}
+			fclose($handle);
+			$buffer = $_lang['page_data_cached'].'<p><textarea style="width: 100%; height: 400px;">'.htmlspecialchars($buffer)."</textarea>\n";
+		}
+		echo $buffer;
+?>
+	</div><!-- end tab-page -->
+<?php } ?>
 
 </div><!-- end documentPane -->
 </div><!-- end sectionBody -->

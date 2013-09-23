@@ -1,5 +1,66 @@
 History
 ================================================================================
+- 1.6.1 August 16, 2013
+    - Snippet: enhanced `orderBy` parameter
+
+- 1.6 July 19, 2013
+    - CustomTV: Clipper 1.2 Compatibility
+
+- 1.5.6 July 18, 2013
+    - Snippet: show multiTV value always if logged into manager regardless of document publishing status
+
+- 1.5.5 June 8, 2013
+    - Snippet: `reverse` parameter
+    
+- 1.5.4 May 24, 2013
+    - Snippet: bugfix for empty multiTV
+    - CustomTV: bugfix for datatables and template var id
+    - CustomTV: corrected invalid language settings
+
+- 1.5.3 May 24, 2013
+    - CustomTV: bugfix for row reordering problem in datatables with more than one datatables multiTV
+
+- 1.5.2 May 15, 2013
+    - CustomTV: bugfix in connector for not published documents
+    - CustomTV: changed path to MODX_MANAGER_PATH base
+    - CustomTV: bugfix for documents that have rich text disabled
+
+- 1.5.1 May 6, 2013
+    - CustomTV: bugfix for datatables and template var id below 10
+    - CustomTV: bugfix for label width in horizontal mode
+
+- 1.5.0 May 3, 2013
+    - CustomTV: bugfix for clear all values and inherited default value
+    - Snippet: customsort extender for Ditto
+    - Example: Sortable Sidebar
+
+- 1.5.0RC April 8, 2013
+    - CustomTV: datatable config (see Links example)
+    - CustomTV: richtext supported in datatable config
+    - CustomTV: context menu in datatable
+    - CustomTV: editing layer for a datatable row
+    - CustomTV: radio tabs in editing layer
+    - CustomTV: column renderer in datatable config with PHx capable template chunk
+
+- 1.4.12 April 2, 2013
+    - CustomTV: thumbnails are not displayed
+    - Snippet: bugfix for orderBy issue
+
+- 1.4.11 February 22, 2013
+    - CustomTV/Snippet: new backwards compatible data format
+    - Snippet: new placeholder in `rowTpl` and `outerTpl`
+    - CustomTV: bugfix for removing the last remaining element
+    - CustomTV: bugfix for datetimepicker inputs moved to new tab with ManagerManager
+
+- 1.4.10 February 14, 2013
+    - Snippet: `offset` and `orderBy` parameter
+    - Snippet: enhanced `toPlaceholder` parameter
+
+- 1.4.9 January 6, 2013
+	- Snippet: `tplConfig` parameter
+
+- 1.4.8 December 12, 2012
+	- Snippet: `outputSeparator` parameter
 
 - 1.4.7 October 3, 2012
 	- CustomTV: better horizontal display with image/file/thumb elements

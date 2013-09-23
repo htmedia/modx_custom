@@ -5,7 +5,7 @@
  * multiTV
  *
  * @category snippet
- * @version 1.4.7
+ * @version 1.6.1
  * @author Jako
  * @internal @modx_category Navigation
  */
